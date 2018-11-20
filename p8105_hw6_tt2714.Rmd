@@ -1,0 +1,21 @@
+---
+title: "p8105_hw6_tt2714"
+author: "Tiffany Tu"
+date: "11/19/2018"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+library(tidyr)
+```
+
+## Problem 1
+```{r message = FALSE}
+homicide = read_csv(file = "./homicide-data.csv") 
+homicide_citystate = homicide %>% 
+  unite(city_state, c(city, state), sep = ", ", remove = T)
+```
+## Problem 2
