@@ -10,6 +10,10 @@ knitr::opts_chunk$set(echo = TRUE)
 library(readr)
 library(dplyr)
 library(tidyr)
+library(knitr)
+library(MASS)
+library(forcats)
+library(broom)
 ```
 
 ## Problem 1
@@ -24,20 +28,31 @@ homicide_citystate = homicide %>%
          victim_sex = ifelse(victim_sex == "Male", 1, 0)) %>% 
   mutate(victim_age = as.numeric(victim_age), 
          victim_sex = as.factor(victim_sex), 
-         victim_race = as.factor(victim_race))
+         victim_race = as.factor(victim_race),
+         victim_race = fct_relevel(victim_race, "1"))
 ```
 
 #### Logistic Regression Model for Baltimore, MD 
-outcome: disposition of homicide
-predictors: age, sex, and race
+Outcome: disposition of homicide
+Reference group: race
+Predictors: sex and age    
+
+Use `broom::tidy` to clean up the model and include odds ratio with confidence intervals. 
 ```{r}
-baltimore_glm = glm(disposition ~ victim_age + victim_sex + victim_race, 
-                    data = homicide_citystate, family = binomial())
-baltimore_glm %>% broom::tidy()
+baltimore = homicide_citystate %>% filter(city_state == "Baltimore, MD")
+baltimore_glm = glm(disposition ~ victim_race + victim_age + victim_sex, 
+                    data = baltimore, family = binomial())
+
+baltimore_glm %>% 
+  broom::tidy(., conf.int = TRUE) %>% 
+  mutate(odds.ratio = exp(estimate),
+         conf.low = exp(conf.low),
+         conf.high = exp(conf.high)) %>% kable()
 ```
+
 
 
 ## Problem 2
 ```{r}
-
+ 
 ```
