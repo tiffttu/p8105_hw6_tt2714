@@ -75,8 +75,15 @@ cities_glm %>% ggplot(aes(color = reorder(city_state, odds.ratio))) +
   xlab("city") + ylab("adjusted odds ratio") + 
   theme(axis.text.y = element_text(size = 6), legend.position = "none") 
 ```
+* comment on plot   
 
 ## Problem 2
-```{r}
- 
+```{r message = FALSE, warning = FALSE}
+birthweight = read_csv(file = "./birthweight.csv")
+birthweight_new = birthweight %>% 
+  mutate(babysex = as.factor(babysex),
+         frace = as.factor(frace),
+         mrace = as.factor(mrace),
+         malform = as.factor(malform))
 ```
+This dataset consists of `r ncol(birthweight)` variables on a child's birthweight. There is a total of `r nrow(birthweight)` entries of children data. The data is prepared for regression analysis with appropriate format and no missing data. 
