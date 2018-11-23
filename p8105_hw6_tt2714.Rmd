@@ -26,12 +26,10 @@ homicide_citystate = homicide %>%
   unite(city_state, c(city, state), sep = ", ", remove = T) %>% 
   filter(!grepl('Dallas|Phoenix|Kansas City|Tulsa', city_state)) %>% 
   mutate(disposition = ifelse(disposition == "Closed by arrest", 1, 0),
-         victim_race = ifelse(victim_race == "White", 1, 0), 
-         victim_sex = ifelse(victim_sex == "Male", 1, 0)) %>% 
+         victim_race = ifelse(victim_race == "White", "white", "non-white")) %>% 
   mutate(victim_age = as.numeric(victim_age), 
-         victim_sex = as.factor(victim_sex), 
-         victim_race = as.factor(victim_race),
-         victim_race = fct_relevel(victim_race, "1"))
+         victim_sex = as.factor(victim_sex),
+         victim_race = fct_relevel(victim_race, "white")) 
 ```
 
 #### Logistic Regression Model for Baltimore, MD 
@@ -61,8 +59,21 @@ cities_glm = homicide_citystate %>%
   nest() %>% 
   mutate(models = map(data, ~glm(disposition ~ victim_race + victim_age + victim_sex, data = .x)),
          models = map(models, broom::tidy)) %>% 
-  select(-data) %>% 
-  unnest() 
+  dplyr::select(-data) %>% 
+  unnest() %>% 
+  mutate(odds.ratio = exp(estimate),
+         conf.low = exp(estimate - std.error * 1.96),
+         conf.high = exp(estimate + std.error * 1.96)) %>% 
+  filter(term == "victim_racenon-white")
+```
+
+```{r}
+cities_glm %>% ggplot(aes(color = reorder(city_state, odds.ratio))) +
+  geom_point(aes(x = reorder(city_state, odds.ratio), y = odds.ratio)) +
+  geom_errorbar(aes(x = city_state, ymin = conf.low, ymax = conf.high)) +
+  coord_flip() + ggtitle("Adjusted odds ratio of non-white to white in each city") +
+  xlab("city") + ylab("adjusted odds ratio") + 
+  theme(axis.text.y = element_text(size = 6), legend.position = "none") 
 ```
 
 ## Problem 2
