@@ -89,10 +89,28 @@ birthweight_new = birthweight %>%
 This dataset consists of `r ncol(birthweight)` variables on a child's birthweight. There is a total of `r nrow(birthweight)` entries of children data. The data is prepared for regression analysis with appropriate format and no missing data. 
 
 #### Regression Model for Birthweight
-I am using a step-wise regression (backward direction) for variable selection, as we have `r ncol(birthweight_new)-1` variables available for birthweight prediction. 
+I am using a step-wise regression (backward direction) for variable selection, as we have `r ncol(birthweight_new) - 1` variables available for birthweight prediction. 
 ```{r results = FALSE}
 model_1 = lm(bwt ~ ., data = birthweight_new)
-stepwise_1 = step(model_1, direction = 'backward')
+stepwise_1 = step(model_1, direction = 'backward') %>% 
+  broom::tidy()
+```
+
+```{r}
+stepwise_1 %>% kable()
+```
+
+This results in `r nrow(stepwise_1) - 1` correlated predictors for birthweight. But because this is still a lot of predictors to be considered, I select the top four with highest coefficients for my model: `babysex`, `blength`, `parity`, and `bhead`.
+
+```{r}
+model_1regression = lm(bwt ~ babysex + blength + parity + bhead, data = birthweight_new ) %>% broom::tidy()
+model_1regression %>% kable()
+```
+
+Residuals against fitted values
+
+```{r}
+
 ```
 
 #### Additional Models
