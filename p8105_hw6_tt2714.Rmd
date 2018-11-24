@@ -15,6 +15,8 @@ library(knitr)
 library(MASS)
 library(forcats)
 library(broom)
+library(modelr)
+library(ggplot2)
 ```
 
 ## Problem 1
@@ -103,14 +105,20 @@ stepwise_1 %>% kable()
 This results in `r nrow(stepwise_1) - 1` correlated predictors for birthweight. But because this is still a lot of predictors to be considered, I select the top four with highest coefficients for my model: `babysex`, `blength`, `parity`, and `bhead`.
 
 ```{r}
-model_1regression = lm(bwt ~ babysex + blength + parity + bhead, data = birthweight_new ) %>% broom::tidy()
-model_1regression %>% kable()
+model_1regression = lm(bwt ~ babysex + blength + parity + bhead, data = birthweight_new )
 ```
 
-Residuals against fitted values
-
+From the plot we see a heavy cluster from weight 2500 to 3500 around the zero mark for residual. However, there remains several outliers below the weight of 1500. 
 ```{r}
+model_1graph = birthweight_new %>% 
+  add_predictions(., model_1regression) %>% 
+  add_residuals(., model_1regression) 
 
+model_1graph %>% 
+  ggplot(., aes(x = pred, y = resid)) +
+  geom_point(alpha = 0.15) +
+  xlab("Predicted Values") + ylab("Residuals") + 
+  ggtitle("Residual against fitted values for birthweight prediction")
 ```
 
 #### Additional Models
