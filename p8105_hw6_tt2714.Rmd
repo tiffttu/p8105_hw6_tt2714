@@ -122,15 +122,25 @@ model_1graph %>%
 ```
 
 #### Additional Models
+Now we'll considered two other models and compare our results using cross validation. 
+   
 Predictors: length at birth and gestational age
 ```{r}
-
+model_2regression = lm(bwt ~ blength + gaweeks, 
+                       data = birthweight_new )
 ```
-
-Head circumference, length, sex and all
+Predictors: head circumference, length, sex and all interactions
 ```{r}
-
+model_3regression = lm(bwt ~ bhead + blength + babysex + 
+                         bhead * blength + bhead * babysex + 
+                         blength * babysex + 
+                         bhead * blength * babysex, 
+                       data = birthweight_new )
 ```
 
 #### Comparing Models
 Comparing my model with cross-validation prediction error
+```{r}
+
+```
+
